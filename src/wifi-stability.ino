@@ -6,13 +6,19 @@
 */
 #include "Particle.h"
 #include "prototypes.h"
+#include "SdLog.h"
+
+// Use sdCard for logging output
+SDcardLogHandler logHandler1;
+// Use primary serial over USB interface for logging output
+SerialLogHandler logHandler;
+
 // reset the system after 60 seconds if the application is unresponsive
 ApplicationWatchdog wd(60000, System.reset);
 
 STARTUP(System.enableFeature(FEATURE_RETAINED_MEMORY));
 
-// Use primary serial over USB interface for logging output
-SerialLogHandler logHandler;
+
 
 // Needed to make the system not try to connect to WiFi before
 //executing setup()
