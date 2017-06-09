@@ -142,7 +142,7 @@ int findAndConnect()
     int found = WiFi.scan(aps, 20);
     Log.info("findAndConnect found %d APs", found);
     // Sort the array to have the strongest first.
-    //sortAPs(aps, found);
+    sortAPs(aps, found);
     // For every APS found, try to connect to it.
     for (int i=0; i<found; i++)
     {
@@ -206,8 +206,8 @@ int findAndConnect()
           noNetworkLog();
         }
 
-
-        // WiFi could not connect or WiFi connected but no internet or both are fine and no cloud,
+        // WiFi could not connect or WiFi connected but no internet or both are
+        // fine and no cloud,
         // find another connection
 
         // Get rid of the network we are connected to, if any
@@ -349,7 +349,7 @@ void noNetworkLog()
 {
   IPAddress addr;
   Log.warn("=== noNetworkLog start ===");
-  Log.info("rssi %d", WiFi.SSID());
+  Log.info("ssid %s", WiFi.SSID());
   Log.info("rssi %d", WiFi.RSSI());
   wd.checkin();
   Log.info("ping %s %d" , googleDNS.toString().c_str(), WiFi.ping(googleDNS, 1));
@@ -372,9 +372,11 @@ bool have_internet()
   // Should return the number of hops.
   if (WiFi.ping(googleDNS, 5) == 0)
   {
+    wd.checkin();
     Log.error("googleDNS was not pingable.");
     return false;
   }
+  wd.checkin();
   return true;
 
 }
@@ -389,10 +391,12 @@ bool have_cloud()
   wd.checkin();
   if(ip)
   {
+    wd.checkin();
     return true;
   }
   else
   {
+    wd.checkin();
     Log.error("The cloud could not resolved.");
     return false;
   }

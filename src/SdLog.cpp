@@ -5,6 +5,7 @@
 // SCK => A3, MISO => A4, MOSI => A5, SS => A2 (default)
 const uint8_t chipSelect = SS;
 SdFat sd;
+extern ApplicationWatchdog wd;
 
 SDcardLogHandler::SDcardLogHandler(String system, LogLevel level,
     const LogCategoryFilters &filters) : LogHandler(level, filters), m_system(system){
@@ -16,6 +17,7 @@ void SDcardLogHandler::log(String message) {
     File myFile1;
     String time = Time.format(Time.now(), TIME_FORMAT_ISO8601_FULL);
     String logLine = String::format("%s %s %s - - - %s\n", time.c_str(), m_system.c_str(), message.c_str());
+    wd.checkin();
     // Initialize SdFat or print a detailed error message and halt
     // Use half speed like the native library.
     // Change to SPI_FULL_SPEED for more performance(was SPI_HALF_SPEED).
@@ -23,17 +25,19 @@ void SDcardLogHandler::log(String message) {
     {
         sd.initErrorHalt();
     }
-
+    wd.checkin();
     // open the file for write at end like the "Native SD library"
     if (!myFile1.open("log.txt", O_RDWR | O_CREAT | O_AT_END))
     {
        sd.errorHalt("opening test.txt for write failed");
     }
+    wd.checkin();
       // if the file opened okay, write to it:
      // Serial.print("Writing to test.txt...");
       myFile1.println(logLine);
       // close the file:
       myFile1.close();
+    wd.checkin();
 }
 
 SDcardLogHandler::~SDcardLogHandler() {
@@ -72,7 +76,7 @@ void SDcardLogHandler::logMessage(const char *msg, LogLevel level, const char *c
         s.concat(category);
         s.concat("] ");
     }
-
+    wd.checkin();
     // Source file
     if (attr.has_file) {
         s = extractFileName(attr.file); // Strip directory path
@@ -87,7 +91,7 @@ void SDcardLogHandler::logMessage(const char *msg, LogLevel level, const char *c
             s.concat(": ");
         }
     }
-
+    wd.checkin();
     // Function name
     if (attr.has_function) {
         size_t n = 0;
