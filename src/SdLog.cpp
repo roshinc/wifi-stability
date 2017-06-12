@@ -1,15 +1,22 @@
 #include "SdFat.h"
 #include "SdLog.h"
-
-//SDFat Config
-// SCK => A3, MISO => A4, MOSI => A5, SS => A2 (default)
-const uint8_t chipSelect = SS;
-SdFat sd;
-extern ApplicationWatchdog wd;
+#include "externs.h"
+#include "constants.h"
 
 SDcardLogHandler::SDcardLogHandler(String system, LogLevel level,
     const LogCategoryFilters &filters) : LogHandler(level, filters), m_system(system){
     LogManager::instance()->addHandler(this);
+    if(!initilized)
+    {
+      // Initialize SdFat or print a detailed error message and halt
+      // Use half speed like the native library.
+      // Change to SPI_FULL_SPEED for more performance(was SPI_HALF_SPEED).
+      if (!sd.begin(chipSelect, SPI_HALF_SPEED))
+      {
+        sd.initErrorHalt();
+      }
+    }
+    initilized = true;
 }
 
 /// Send the log message to Papertrail.
@@ -18,13 +25,6 @@ void SDcardLogHandler::log(String message) {
     String time = Time.format(Time.now(), TIME_FORMAT_ISO8601_FULL);
     String logLine = String::format("%s %s %s - - - %s\n", time.c_str(), m_system.c_str(), message.c_str());
     wd.checkin();
-    // Initialize SdFat or print a detailed error message and halt
-    // Use half speed like the native library.
-    // Change to SPI_FULL_SPEED for more performance(was SPI_HALF_SPEED).
-    if (!sd.begin(chipSelect, SPI_FULL_SPEED))
-    {
-        sd.initErrorHalt();
-    }
     wd.checkin();
     // open the file for write at end like the "Native SD library"
     if (!myFile1.open("log.txt", O_RDWR | O_CREAT | O_AT_END))
