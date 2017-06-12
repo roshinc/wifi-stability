@@ -5,23 +5,28 @@
 * Date:
 */
 #include "Particle.h"
-#include "prototypes.h"
-#include "SdLog.h"
+#include "SdFat.h"
 #include <OneWire.h>
+#include "SdLog.h"
+#include "prototypes.h"
+#include "globals.h"
+#include "constants.h"
+#include "HybridLog.h"
 
-// Use sdCard for logging output
-SDcardLogHandler logHandler1;
-// Use primary serial over USB interface for logging output
-SerialLogHandler logHandler;
-
-// reset the system after 60 seconds if the application is unresponsive
-ApplicationWatchdog wd(60000, System.reset);
-
-//STARTUP(System.enableFeature(FEATURE_RETAINED_MEMORY));
 
 // Needed to make the system not try to connect to WiFi before
 //executing setup()
 SYSTEM_MODE(SEMI_AUTOMATIC);
+
+
+// Use sdCard for logging output
+SDcardLogHandler logHandler1;
+// Use primary serial over USB interface for logging output
+//SerialLogHandler logHandler;
+// Use primary serial over USB interface for logging output
+HybridLogHandler logHandler;
+
+//STARTUP(System.enableFeature(FEATURE_RETAINED_MEMORY));
 
 OneWire ds = OneWire(D4);  // 1-wire signal on pin D4
 
@@ -33,12 +38,13 @@ float lastTemp;
 // Executes on boot because we changed the system mode
 void setup() {
   char *message = "yes i am.";
+  // Initilized sd
+  LazyInit();
   // Put initialization like pinMode and begin functions here.
   Log.info("Booting %s", System.version().c_str());
   System.on(all_events, handle_all_the_events);
   // Connect to WiFi using the credentials stored, or find a new network.
   initialConnect();
-
   // variable name max length is 12 characters long
   Particle.variable("areyoualive", message);
 }
@@ -49,6 +55,8 @@ void loop() {
   // Keep-alive
   Particle.process();
   checkNetwork();
+  checkIns();
+  logHandler.loop();
   checkIns();
 
   //Maker Kit tutorial
@@ -229,4 +237,19 @@ void loop() {
     wd.checkin();
     // Keep-alive
     Particle.process();
+  }
+
+  void LazyInit()
+  {
+    if(!initilized)
+    {
+      // Initialize SdFat or print a detailed error message and halt
+      // Use half speed like the native library.
+      // Change to SPI_FULL_SPEED for more performance(was SPI_HALF_SPEED).
+      if (!sd.begin(chipSelect, SPI_HALF_SPEED))
+      {
+        sd.initErrorHalt();
+      }
+    }
+    initilized = true;
   }

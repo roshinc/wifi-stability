@@ -31,11 +31,15 @@ void initialConnect()
 
   // WiFi can't connect with current credentials, find new ones.
   if(!WiFi.ready())
-  findAndConnect();
+  {
+    findAndConnect();
+  }
 
   // if we don't have Internet go find an AP that does.
   if(!have_internet())
-  findAndConnect();
+  {
+    findAndConnect();
+  }
 
   // Connect to the cloud.
   Particle.connect();
