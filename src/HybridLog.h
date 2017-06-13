@@ -29,6 +29,7 @@ private:
     const char* extractFuncName(const char *s, size_t *size);
     void log(String message);
     void sendLine();
+    bool LazyInitHL();
 
 protected:
     virtual void logMessage(const char *msg, LogLevel level, const char *category, const LogAttributes &attr) override;

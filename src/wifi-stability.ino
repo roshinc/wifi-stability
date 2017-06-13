@@ -1,29 +1,26 @@
 /*
 * Project wifi-stability
-* Description:
-* Author:
-* Date:
+* Description: Testing of the stablity of wifi on a photon.
 */
 #include "Particle.h"
 #include "SdFat.h"
 #include <OneWire.h>
-#include "SdLog.h"
 #include "prototypes.h"
 #include "globals.h"
 #include "constants.h"
+#include "SdLog.h"
 #include "HybridLog.h"
-
 
 // Needed to make the system not try to connect to WiFi before
 //executing setup()
 SYSTEM_MODE(SEMI_AUTOMATIC);
 
 
-// Use sdCard for logging output
+// Use sdCard for logging output.
 SDcardLogHandler logHandler1;
 // Use primary serial over USB interface for logging output
-//SerialLogHandler logHandler;
-// Use primary serial over USB interface for logging output
+//SerialLogHandler logHandler2;
+// Use SDCard and cloud as logging output.
 HybridLogHandler logHandler;
 
 //STARTUP(System.enableFeature(FEATURE_RETAINED_MEMORY));
@@ -37,15 +34,32 @@ float lastTemp;
 // setup() runs once, when the device is first turned on.
 // Executes on boot because we changed the system mode
 void setup() {
+  //while(!Serial.isConnected())
+  //{
+  //     Particle.process();
+  //}
+
+  //Alive message
   char *message = "yes i am.";
+
   // Initilized sd
   LazyInit();
-  // Put initialization like pinMode and begin functions here.
+
+  //Start off the log with a boot msg.
   Log.info("Booting %s", System.version().c_str());
+
+  //Call handle_all_the_events on every system event
   System.on(all_events, handle_all_the_events);
+
+  //FOR TESTING
+  // Connects to a network secured with WPA2 credentials.
+  //WiFi.setCredentials("OpenWrt", "helloworld");
+
   // Connect to WiFi using the credentials stored, or find a new network.
   initialConnect();
+
   // variable name max length is 12 characters long
+  //Alive varible
   Particle.variable("areyoualive", message);
 }
 
@@ -54,12 +68,18 @@ void loop() {
 
   // Keep-alive
   Particle.process();
+  //Check network health.
   checkNetwork();
+
+  //Keep-alives
   checkIns();
+  //Let HybridLogHandler do it sending
   logHandler.loop();
+  //Keep-alives
   checkIns();
 
   //Maker Kit tutorial
+  //Shortend version of actual code see url below for full code.
   //https://docs.particle.io/tutorials/projects/maker-kit/#tutorial-4-temperature-logger
   byte i;
   byte present = 0;
@@ -68,24 +88,17 @@ void loop() {
   byte addr[8];
   float celsius, fahrenheit;
 
-  if ( !ds.search(addr)) {
-    Serial.println("No more addresses.");
-    Serial.println();
-    ds.reset_search();
-    checkIns();
-    delay(250);
-    wd.checkin();
-    return;
-  }
 
-  // The order is changed a bit in this example
-  // first the returned address is printed
+  //Chip = DS18B20
+  addr[0] = 0x28;
+  addr[1] = 0xFF;
+  addr[2] = 0x97;
+  addr[3] = 0xFE;
+  addr[4] = 0x53;
+  addr[5] = 0x15;
+  addr[6] = 0x2;
+  addr[7] = 0xFA;
 
-  Serial.print("ROM =");
-  for( i = 0; i < 8; i++) {
-    Serial.write(' ');
-    Serial.print(addr[i], HEX);
-  }
   checkIns();
 
   // second the CRC is checked, on fail,
@@ -95,39 +108,13 @@ void loop() {
     Serial.println("CRC is not valid!");
     return;
   }
-  Serial.println();
+
   checkIns();
   // we have a good address at this point
-  // what kind of chip do we have?
-  // we will set a type_s value for known types or just return
-
-  // the first ROM byte indicates which chip
-  switch (addr[0]) {
-    case 0x10:
-    Serial.println("  Chip = DS1820/DS18S20");
-    type_s = 1;
-    break;
-    case 0x28:
-    Serial.println("  Chip = DS18B20");
-    type_s = 0;
-    break;
-    case 0x22:
-    Serial.println("  Chip = DS1822");
-    type_s = 0;
-    break;
-    case 0x26:
-    Serial.println("  Chip = DS2438");
-    type_s = 2;
-    break;
-    default:
-    Serial.println("Unknown device type.");
-    return;
-  }
-  checkIns();
   // this device has temp so let's read it
 
   ds.reset();               // first clear the 1-wire bus
-  ds.select(addr);          // now select the device we just found
+  ds.select(addr);          // now select the device
   // ds.write(0x44, 1);     // tell it to start a conversion, with parasite power on at the end
   ds.write(0x44, 0);        // or start conversion in powered mode (bus finishes low)
 
@@ -147,8 +134,9 @@ void loop() {
   ds.write(0xB8,0);         // Recall Memory 0
   ds.write(0x00,0);         // Recall Memory 0
 
-  // now read the scratch pad
   checkIns();
+
+  // now read the scratch pad
   present = ds.reset();
   ds.select(addr);
   ds.write(0xBE,0);         // Read Scratchpad
@@ -156,8 +144,9 @@ void loop() {
     ds.write(0x00,0);       // The DS2438 needs a page# to read
   }
 
-  // transfer and print the values
   checkIns();
+
+  // transfer and print the values
   Serial.print("  Data = ");
   Serial.print(present, HEX);
   Serial.print(" ");
@@ -169,7 +158,9 @@ void loop() {
   Serial.print(" CRC=");
   Serial.print(OneWire::crc8(data, 8), HEX);
   Serial.println();
+
   checkIns();
+
   // Convert the data to actual temperature
   // because the result is a 16 bit signed integer, it should
   // be stored to an "int16_t" type, which is always 16 bits
@@ -222,12 +213,15 @@ void loop() {
     Serial.print(" Celsius, ");
     Serial.print(fahrenheit);
     Serial.println(" Fahrenheit");
+
     checkIns();
     checkNetwork();
+
     // now that we have the readings, we can publish them to the cloud
     String temperature = String(fahrenheit); // store temp in "temperature" string
     Particle.publish("temperature", temperature, PRIVATE); // publish to cloud
     delay(5000); // 5 second delay
+
     checkIns();
   }
 
@@ -248,7 +242,7 @@ void loop() {
       // Change to SPI_FULL_SPEED for more performance(was SPI_HALF_SPEED).
       if (!sd.begin(chipSelect, SPI_HALF_SPEED))
       {
-        sd.initErrorHalt();
+        sd.initErrorPrint();
       }
     }
     initilized = true;

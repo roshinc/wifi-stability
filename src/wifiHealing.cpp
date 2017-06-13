@@ -21,7 +21,7 @@ void initialConnect()
 {
   // Turn WiFi on.
   WiFi.on();
-
+  //WiFi.setCredentials("OpenWrt", "helloworld");
   // Connect to WiFi using the credentials stored and don't go into listening mode
   /*
   Note: WiFi.connect would only go into listening mode if there are no credentials stored,

@@ -28,6 +28,7 @@ private:
     const char* extractFileName(const char *s);
     const char* extractFuncName(const char *s, size_t *size);
     void log(String message);
+    bool LazyInitSDL();
 
 protected:
     virtual void logMessage(const char *msg, LogLevel level, const char *category, const LogAttributes &attr) override;
