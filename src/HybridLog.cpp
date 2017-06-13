@@ -145,7 +145,7 @@ HybridLogHandler::HybridLogHandler(String system, LogLevel level,
   void HybridLogHandler::log(String message) {
     File myFileHybrid; //Holds the file
     String time = Time.format(Time.now(), TIME_FORMAT_ISO8601_FULL); //Create a time stamp
-    String logLine = String::format("%s %s %s - - - %s\n", time.c_str(), m_system.c_str(), message.c_str()); //Create the line to log
+    String logLine = String::format("%s %s - - - %s\n", time.c_str(), message.c_str()); //Create the line to log
     wd.checkin(); // reset watchdog timer
 
     //Make sure sd is initilized
