@@ -6,7 +6,7 @@
 #error This library requires FW version 0.6.1 and above.
 #endif
 
-/// LogHandler that send logs to Papertrail (https://papertrailapp.com/). Before using this class it's best to
+/// LogHandler that writes logs to SdCard and then sends them to the cloud. Before using this class it's best to
 /// familiarize yourself with Particle's loggin facility https://docs.particle.io/reference/firmware/photon/#logging.
 /// You can use this as any other LogHandler - Initialize this class as a global, then call Log.info() and friends.
 class HybridLogHandler : public LogHandler {
