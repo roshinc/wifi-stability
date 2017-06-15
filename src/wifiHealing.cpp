@@ -21,6 +21,10 @@ void initialConnect()
 {
   // Turn WiFi on.
   WiFi.on();
+
+  //Log the nextworks we have.
+  logCurrentNetworks();
+
   //WiFi.setCredentials("OpenWrt", "helloworld");
   // Connect to WiFi using the credentials stored and don't go into listening mode
   /*
@@ -80,6 +84,9 @@ void checkNetwork()
       //if the cloud can't be reached.
       // *We might have just been ideal too long try to connect to the same network -> seems to just
       //hang so not going to do this.
+
+      //if we don't have a connection to the cloud.
+      if(Particle.connected())
       {
         wd.checkin();
         // Keep-alive
@@ -137,6 +144,7 @@ int findAndConnect()
     //}
     // Forget the networks we know.
     WiFi.clearCredentials();
+    WiFi.setCredentials("OpenWrt", "helloworld"); ///////TESTINGGGGGGGGG
     // Scan for 20 networks (at most 20, 'found' holds the # of the actual APs found) and put it into aps array.
     int found = WiFi.scan(aps, 20);
     Log.info("findAndConnect found %d APs", found);
