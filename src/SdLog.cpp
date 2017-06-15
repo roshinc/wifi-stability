@@ -23,7 +23,6 @@ SDcardLogHandler::SDcardLogHandler(String system, LogLevel level,
     {
       return;
     }
-
     sdlIsWriting = true;
     // open the file for write at end like the "Native SD library"
     if (!myFileSDLog.open("log.txt", O_RDWR | O_CREAT | O_AT_END))
@@ -34,11 +33,9 @@ SDcardLogHandler::SDcardLogHandler(String system, LogLevel level,
     // if the file opened okay, write to it:
     // Serial.print("Writing to test.txt...");
     myFileSDLog.println(logLine);
-
     myFileSDLog.flush();
     // close the file:
     myFileSDLog.close();
-
     sdlIsWriting = false;
     //Reset watchdog timer.
     wd.checkin();

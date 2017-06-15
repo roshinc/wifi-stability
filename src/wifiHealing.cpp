@@ -80,18 +80,13 @@ void checkNetwork()
       //if the cloud can't be reached.
       // *We might have just been ideal too long try to connect to the same network -> seems to just
       //hang so not going to do this.
-      if(have_cloud())
       {
         wd.checkin();
-        //if we don't have a connection to the cloud.
-        if(Particle.connected())
-        {
-          wd.checkin();
-          // Keep-alive
-          Particle.process();
-          return;
-        }
+        // Keep-alive
+        Particle.process();
+        return;
       }
+
     }
   }
   //if we reach here then one of the previous checks have failed, so we have
@@ -220,59 +215,59 @@ int findAndConnect()
         WiFi.clearCredentials();
         wd.checkin();
         Log.error("Could not connect to %s, moving on...", ap.ssid);
-      }// End of if
-    }// End of for
-    whileRun++;
-    wd.checkin();
-    Serial.println("while loop");
-  }// End of while
-  findAndConnectRunning = false;
-  return -1;
-}
-/*
-Called whenever a system event is raised, used primarly for logging.
-References:
-- https://github.com/spark/firmware/blob/develop/system/inc/system_event.h
-- https://docs.particle.io/reference/firmware/photon/#system-events-reference
-*/
-void handle_all_the_events(system_event_t event, int param)
-{
-  //network status events
-  if (event == network_status)
-  {
-    if(param==network_status_powering_off)
-    {
-      Log.info("network_status_powering_off");
-    }
-    if(param==network_status_off)
-    {
-      Log.info("network_status_off");
-    }
-    if(param==network_status_powering_on)
-    {
-      Log.info("network_status_powering_on");
-    }
-    if(param==network_status_on)
-    {
-      Log.info("network_status_on");
-    }
-    if(param==network_status_connecting)
-    {
-      Log.info("network_status_connecting");
-    }
-    if(param==network_status_connected)
-    {
-      Log.info("network_status_connected");
-    }
-    if(param==network_status_disconnecting)
-    {
-      Log.info("network_status_disconnecting");
-    }
-    if(param==network_status_disconnected)
-    {
-      Log.info("network_status_disconnected");
-    }
-  }
+        }// End of if
+        }// End of for
+        whileRun++;
+        wd.checkin();
+        Serial.println("while loop");
+        }// End of while
+        findAndConnectRunning = false;
+        return -1;
+      }
+      /*
+      Called whenever a system event is raised, used primarly for logging.
+      References:
+      - https://github.com/spark/firmware/blob/develop/system/inc/system_event.h
+      - https://docs.particle.io/reference/firmware/photon/#system-events-reference
+      */
+      void handle_all_the_events(system_event_t event, int param)
+      {
+        //network status events
+        if (event == network_status)
+        {
+          if(param==network_status_powering_off)
+          {
+            Log.info("network_status_powering_off");
+          }
+          if(param==network_status_off)
+          {
+            Log.info("network_status_off");
+          }
+          if(param==network_status_powering_on)
+          {
+            Log.info("network_status_powering_on");
+          }
+          if(param==network_status_on)
+          {
+            Log.info("network_status_on");
+          }
+          if(param==network_status_connecting)
+          {
+            Log.info("network_status_connecting");
+          }
+          if(param==network_status_connected)
+          {
+            Log.info("network_status_connected");
+          }
+          if(param==network_status_disconnecting)
+          {
+            Log.info("network_status_disconnecting");
+          }
+          if(param==network_status_disconnected)
+          {
+            Log.info("network_status_disconnected");
+          }
+        }
 
 
   //Cloud events
@@ -300,134 +295,151 @@ void handle_all_the_events(system_event_t event, int param)
   }
 
 
-  //Network credentials events
-  if (event==network_credentials)
-  {
-    if(param==network_credentials_added)
-    {
-      Log.info("network_credentials_added");
-    }
-    if(param == network_credentials_cleared)
-    {
-      Log.info("network_credentials_cleared");
-    }
-  }
-  if (event==firmware_update)
-  {
-    if(param== firmware_update_failed)
-    {
-      Log.info("firmware_update_failed");
-    }
-    if(param==firmware_update_begin)
-    {
-      Log.info("firmware_update_begin");
-    }
-    if(param==firmware_update_complete)
-    {
-      Log.info("firmware_update_complete");
-    }
-  }
+        //Network credentials events
+        if (event==network_credentials)
+        {
+          if(param==network_credentials_added)
+          {
+            Log.info("network_credentials_added");
+          }
+          if(param == network_credentials_cleared)
+          {
+            Log.info("network_credentials_cleared");
+          }
+        }
+        if (event==firmware_update)
+        {
+          if(param== firmware_update_failed)
+          {
+            Log.info("firmware_update_failed");
+          }
+          if(param==firmware_update_begin)
+          {
+            Log.info("firmware_update_begin");
+          }
+          if(param==firmware_update_complete)
+          {
+            Log.info("firmware_update_complete");
+          }
+        }
 
-  if (event==time_changed)
-  {
-    if(param==time_changed_manually)
-    {
-      Log.info("time_changed_manually");
-    }
-    if(param==time_changed_sync)
-    {
-      Log.info("time_changed_sync");
-    }
-  }
-  if (event==reset) {
-    Log.info("reset");
-  }
+        if (event==time_changed)
+        {
+          if(param==time_changed_manually)
+          {
+            Log.info("time_changed_manually");
+          }
+          if(param==time_changed_sync)
+          {
+            Log.info("time_changed_sync");
+          }
+        }
+        if (event==reset) {
+          Log.info("reset");
+        }
 
-  //Serial.println(WiFi.localIP());
-  //Serial.println(WiFi.dhcpServerIP());
-}
-
-// Called when there network contivitty fails
-// logs a dns, ping request and also the signal strength of the current wifi.
-void noNetworkLog()
-{
-  IPAddress addr;
-  Log.warn("=== noNetworkLog start ===");
-  Log.info("ssid %s", WiFi.SSID());
-  Log.info("rssi %d", WiFi.RSSI());
-  wd.checkin();
-  Log.info("ping %s %d" , googleDNS.toString().c_str(), WiFi.ping(googleDNS, 1));
-  addr = WiFi.resolve(cloudHost);
-  Log.info("dns %s %s", cloudHost, addr.toString().c_str());
-  wd.checkin();
-  Log.warn("=== noNetworkLog end ===");
-  wd.checkin();
-  // api.particle.io doesn't respond to ping, so this would always fail
-  // logBuffer.queue(true, "ping,%s,%d", addr.toString().c_str(), WiFi.ping(addr, 1));
-}
-
-/*
-* Check if there is Internet by pinging 8.8.8.8
-* Returns true if there is Internet; false if not.
-*/
-bool have_internet()
-{
-  wd.checkin();
-  // Should return the number of hops.
-  if (WiFi.ping(googleDNS, 5) == 0)
-  {
-    wd.checkin();
-    Log.error("googleDNS was not pingable.");
-    return false;
-  }
-  wd.checkin();
-  return true;
-
-}
-
-/*
-* See if we have cloud by resolving "api.particle.io"
-* Returns true if we can resolve it; false otherwise.
-*/
-bool have_cloud()
-{
-  IPAddress ip = WiFi.resolve(cloudHost);
-  wd.checkin();
-  if(ip)
-  {
-    wd.checkin();
-    return true;
-  }
-  else
-  {
-    wd.checkin();
-    Log.error("The cloud could not resolved.");
-    return false;
-  }
-}
-
-/*
-* Sort the list of APs to be strongest first.
-* Just a simple bubble sort, -1dB (strong) to -127 (weak)
-*/
-void sortAPs(WiFiAccessPoint aps[], int foundAPs)
-{
-  int i, j, flag = 1;    // set flag to 1 to start first pass
-  WiFiAccessPoint temp;             // holding variable
-  for(i = 1; (i <= foundAPs) && flag; i++)
-  {
-    wd.checkin();
-    flag = 0;
-    for (j=0; j < (foundAPs -1); j++)
-    {
-      wd.checkin();
-      if (aps[j+1].rssi > aps[j].rssi)
-      {
-        temp = aps[j];             // swap
-        aps[j] = aps[j+1];
-        aps[j+1] = temp;
-        flag = 1;               //swap occurred.
+        //Serial.println(WiFi.localIP());
+        //Serial.println(WiFi.dhcpServerIP());
       }
-    }
-  }
-}
+
+      // Called when there network contivitty fails
+      // logs a dns, ping request and also the signal strength of the current wifi.
+      void noNetworkLog()
+      {
+        IPAddress addr;
+        Log.warn("=== noNetworkLog start ===");
+        Log.info("ssid %s", WiFi.SSID());
+        Log.info(WiFi.SSID());
+        Log.info("rssi %d", WiFi.RSSI());
+        wd.checkin();
+        Log.info("ping %s %d" , googleDNS.toString().c_str(), WiFi.ping(googleDNS, 1));
+        addr = WiFi.resolve(cloudHost);
+        Log.info("dns %s %s", cloudHost, addr.toString().c_str());
+        wd.checkin();
+        Log.warn("=== noNetworkLog end ===");
+        wd.checkin();
+        // api.particle.io doesn't respond to ping, so this would always fail
+        // logBuffer.queue(true, "ping,%s,%d", addr.toString().c_str(), WiFi.ping(addr, 1));
+      }
+
+      // Called at boot.
+      // logs the current networks.
+      void logCurrentNetworks()
+      {
+        WiFiAccessPoint ap[5];
+        int found = WiFi.getCredentials(ap, 5);
+        Log.info("Credentials we have: ");
+        for (int i = 0; i < found; i++) {
+          Log.info("SSID: %s", ap[i].ssid);
+          Log.info("Security: %d", ap[i].security);
+          Log.info("Channel: %d", ap[i].channel);
+          Log.info("RSSI: %d", ap[i].rssi);
+        }
+      }
+
+      /*
+      * Check if there is Internet by pinging 8.8.8.8
+      * Returns true if there is Internet; false if not.
+      */
+      bool have_internet()
+      {
+        wd.checkin();
+        // Should return the number of hops.
+        if (WiFi.ping(googleDNS, 5) == 0)
+        {
+          wd.checkin();
+          Log.error("googleDNS was not pingable.");
+          return false;
+        }
+        wd.checkin();
+        return true;
+
+      }
+
+      /*
+      * See if we have cloud by resolving "api.particle.io"
+      * Returns true if we can resolve it; false otherwise.
+      * NOT USEFULL
+      */
+      bool have_cloud()
+      {
+        IPAddress ip = WiFi.resolve(cloudHost);
+        wd.checkin();
+        if(ip)
+        {
+          wd.checkin();
+          return true;
+        }
+        else
+        {
+          wd.checkin();
+          Log.error("The cloud could not resolved.");
+          return false;
+        }
+      }
+
+      /*
+      * Sort the list of APs to be strongest first.
+      * Just a simple bubble sort, -1dB (strong) to -127 (weak)
+      */
+      void sortAPs(WiFiAccessPoint aps[], int foundAPs)
+      {
+        int i, j, flag = 1;    // set flag to 1 to start first pass
+        WiFiAccessPoint temp;             // holding variable
+        for(i = 1; (i <= foundAPs) && flag; i++)
+        {
+          wd.checkin();
+          flag = 0;
+          for (j=0; j < (foundAPs -1); j++)
+          {
+            wd.checkin();
+            if (aps[j+1].rssi > aps[j].rssi)
+            {
+              temp = aps[j];             // swap
+              aps[j] = aps[j+1];
+              aps[j+1] = temp;
+              flag = 1;               //swap occurred.
+            }
+          }
+        }
+      }
