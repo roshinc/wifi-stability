@@ -161,6 +161,7 @@ HybridLogHandler::HybridLogHandler(String system, LogLevel level,
       EEPROM.put(10, 0);
       //Serial.println("No File");
     }
+    hlIsWriting = true;
     // open the file for write at end like the "Native SD library"
     if (!myFileHybrid.open("Hlog.txt", O_RDWR | O_CREAT | O_AT_END))
     {
@@ -172,8 +173,10 @@ HybridLogHandler::HybridLogHandler(String system, LogLevel level,
     // if the file opened okay, write to it:
     // Serial.print("Writing to test.txt...");
     myFileHybrid.println(logLine);
+    myFileHybrid.flush();
     // close the file:
     myFileHybrid.close();
+    hlIsWriting = false;
     wd.checkin();// reset watchdog timer
   }
 

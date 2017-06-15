@@ -247,3 +247,29 @@ void loop() {
     }
     initilized = true;
   }
+int cloudCalls(String useless)
+{
+  shutdown();
+  return 1;
+}
+
+void shutdown(){
+    while(hlIsWriting || sdlIsWriting)
+    {
+      checkIns();
+    }
+    while(1)
+    {
+      digitalWrite(led1, HIGH);
+
+      // We'll leave it on for 1 second...
+      delay(1000);
+
+      // Then we'll turn it off...
+      digitalWrite(led1, LOW);
+
+      // Wait 1 second...
+      delay(1000);
+    }
+
+}
