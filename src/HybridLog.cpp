@@ -155,6 +155,12 @@ HybridLogHandler::HybridLogHandler(String system, LogLevel level,
       return;
     }
 
+    if(!sd.exists("Hlog.txt"))
+    {
+      //If the files does not exist erase the seek value stored in EEPROM.
+      EEPROM.put(10, 0);
+      //Serial.println("No File");
+    }
     // open the file for write at end like the "Native SD library"
     if (!myFileHybrid.open("Hlog.txt", O_RDWR | O_CREAT | O_AT_END))
     {
