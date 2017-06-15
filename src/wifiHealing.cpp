@@ -278,29 +278,29 @@ int findAndConnect()
         }
 
 
-  //Cloud events
-  if(event == cloud_status)
-  {
-    if(param==cloud_status_disconnected)
-    {
-      Log.warn("cloud_status_disconnected");
-      //Log.error("calling find and connect from cs %s", findAndConnectRunning);
-      //findAndConnect();
-    }
-    //Already logged by system.
-    //if(param==cloud_status_connecting)
-    //{
-    //  Log.info("cloud_status_connecting");
-    //}
-    //if(param==cloud_status_connected)
-    //{
-    //  Log.info("cloud_status_connected");
-    //}
-    if(param==cloud_status_disconnecting)
-    {
-      Log.info("cloud_status_disconnecting");
-    }
-  }
+        //Cloud events
+        if(event == cloud_status)
+        {
+          if(param==cloud_status_disconnected)
+          {
+            Log.warn("cloud_status_disconnected");
+            //Log.error("calling find and connect from cs %s", findAndConnectRunning);
+            //findAndConnect();
+          }
+          //Already logged by system.
+          //if(param==cloud_status_connecting)
+          //{
+          //  Log.info("cloud_status_connecting");
+          //}
+          //if(param==cloud_status_connected)
+          //{
+          //  Log.info("cloud_status_connected");
+          //}
+          if(param==cloud_status_disconnecting)
+          {
+            Log.info("cloud_status_disconnecting");
+          }
+        }
 
 
         //Network credentials events

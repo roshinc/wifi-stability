@@ -126,7 +126,7 @@ HybridLogHandler::HybridLogHandler(String system, LogLevel level,
       if (Particle.publish("HLog", buffer, 21600))
       {
         // The value to seek by to get the next line
-        toSeek = cPos+2;
+        toSeek = cPos+1;
         // Write the seek value (2 bytes) to the EEPROM address
         EEPROM.put(addr, toSeek);
       }
@@ -135,7 +135,7 @@ HybridLogHandler::HybridLogHandler(String system, LogLevel level,
     {
       //if its not a vaild string, just change the seek value.
       // The value to seek by to get the next line
-      toSeek = cPos+2;
+      toSeek = cPos+1;
       // Write the seek value (2 bytes) to the EEPROM address
       EEPROM.put(addr, toSeek);
     }
@@ -145,7 +145,7 @@ HybridLogHandler::HybridLogHandler(String system, LogLevel level,
   void HybridLogHandler::log(String message) {
     File myFileHybrid; //Holds the file
     String time = Time.format(Time.now(), TIME_FORMAT_ISO8601_FULL); //Create a time stamp
-    String logLine = String::format("%s %s - - - %s\n", time.c_str(), message.c_str()); //Create the line to log
+    String logLine = String::format("%s %s - - -", time.c_str(), message.c_str()); //Create the line to log
     wd.checkin(); // reset watchdog timer
 
     //Make sure sd is initilized

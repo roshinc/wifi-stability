@@ -6,3 +6,4 @@ void noNetworkLog();
 bool have_internet();
 bool have_cloud();
 void sortAPs(WiFiAccessPoint aps[], int foundAPs);
+void logCurrentNetworks();

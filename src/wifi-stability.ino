@@ -62,6 +62,7 @@ void setup() {
   initialConnect();
 
   // variable name max length is 12 characters long
+
   //Alive varible
   Particle.variable("areyoualive", message);
   Particle.variable("issdgood", initilized);
