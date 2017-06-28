@@ -16,6 +16,9 @@
 //executing setup()
 SYSTEM_MODE(SEMI_AUTOMATIC);
 
+//Adress of id
+int id_addr = 20;
+int id; // 4 bytes
 
 // Use sdCard for logging output.
 SDcardLogHandler logHandler1;
@@ -60,6 +63,16 @@ void setup() {
 
   // Connect to WiFi using the credentials stored, or find a new network.
   initialConnect();
+
+  //If this device has an id of 4 store it in memory.
+  //Only do this once.
+  //int id = 4; // 4 bytes
+  //EEPROM.put(id_addr, id);
+  //Get the id of this device.
+  EEPROM.get(id_addr, id);
+  //String id_stri = String::format("ny_t%d", id); //Create the line to log
+  Particle.publish("id_d", id_stri, PRIVATE);
+
 
   // variable name max length is 12 characters long
 
