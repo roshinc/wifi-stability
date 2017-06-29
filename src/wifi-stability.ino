@@ -21,11 +21,11 @@ int id_addr = 20;
 int id; // 4 bytes
 
 // Use sdCard for logging output.
-SDcardLogHandler logHandler1;
+//SDcardLogHandler logHandler1;
 // Use primary serial over USB interface for logging output
 //SerialLogHandler logHandler2;
 // Use SDCard and cloud as logging output.
-HybridLogHandler logHandler;
+//HybridLogHandler logHandler;
 
 //STARTUP(System.enableFeature(FEATURE_RETAINED_MEMORY));
 
@@ -49,7 +49,7 @@ void setup() {
   char *message = "yes i am.";
 
   // Initilized sd
-  LazyInit();
+  //LazyInit();
 
   //Start off the log with a boot msg.
   Log.info("Booting %s", System.version().c_str());
@@ -70,7 +70,7 @@ void setup() {
   //EEPROM.put(id_addr, id);
   //Get the id of this device.
   EEPROM.get(id_addr, id);
-  //String id_stri = String::format("ny_t%d", id); //Create the line to log
+  String id_stri = String::format("ny_t%d", id); //Create the line to log
   Particle.publish("id_d", id_stri, PRIVATE);
 
 
@@ -100,7 +100,7 @@ void loop() {
   //Keep-alives
   checkIns();
   //Let HybridLogHandler do it sending
-  logHandler.loop();
+  //logHandler.loop();
   //Keep-alives
   checkIns();
 
