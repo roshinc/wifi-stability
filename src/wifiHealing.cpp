@@ -23,7 +23,7 @@ void initialConnect()
   WiFi.on();
 
   //Log the nextworks we have.
-  logCurrentNetworks();
+  //logCurrentNetworks();
 
   //WiFi.setCredentials("OpenWrt", "helloworld");
   // Connect to WiFi using the credentials stored and don't go into listening mode
@@ -203,14 +203,14 @@ int findAndConnect()
           {
             Log.error("Internet is bad!");
             wd.checkin();
-            noNetworkLog();
+            //noNetworkLog();
           }
         }
         else
         {
           Log.error("WiFi is bad!");
           wd.checkin();
-          noNetworkLog();
+          //noNetworkLog();
         }
 
         // WiFi could not connect or WiFi connected but no internet or both are
