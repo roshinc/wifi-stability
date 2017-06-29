@@ -1,16 +1,12 @@
 /*
-* Project wifi-stability
-* Description: Testing of the stablity of wifi on a photon.
+* Project: Temprature Sensor
+* Description: Reporting temprature reliably.
 */
 #include "Particle.h"
-#include "SdFat.h"
 #include <OneWire.h>
 #include "prototypes.h"
-#include "globals.h"
-#include "constants.h"
-#include "SdLog.h"
-#include "HybridLog.h"
 
+ApplicationWatchdog wd(60000, System.reset); // system reboot watchdog
 
 // Needed to make the system not try to connect to WiFi before
 //executing setup()
@@ -20,20 +16,11 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 int id_addr = 20;
 int id; // 4 bytes
 
-// Use sdCard for logging output.
-//SDcardLogHandler logHandler1;
 // Use primary serial over USB interface for logging output
 //SerialLogHandler logHandler2;
-// Use SDCard and cloud as logging output.
-//HybridLogHandler logHandler;
-
-//STARTUP(System.enableFeature(FEATURE_RETAINED_MEMORY));
-
-int led1 = D7; // Instead of writing D7 over and over again, we'll write led2
 
 OneWire ds = OneWire(D4);  // 1-wire signal on pin D4
 
-unsigned long lastUpdate = 0;
 int lastSendTemp = 0;
 float lastTemp;
 
@@ -46,16 +33,13 @@ void setup() {
   //}
 
   //Alive message
-  char *message = "yes i am.";
-
-  // Initilized sd
-  //LazyInit();
+  const char *message = "yes i am.";
 
   //Start off the log with a boot msg.
-  Log.info("Booting %s", System.version().c_str());
+  //Log.info("Booting %s", System.version().c_str());
 
   //Call handle_all_the_events on every system event
-  System.on(all_events, handle_all_the_events);
+  //System.on(all_events, handle_all_the_events);
 
   //FOR TESTING
   // Connects to a network secured with WPA2 credentials.
@@ -66,8 +50,8 @@ void setup() {
 
   //If this device has an id of 4 store it in memory.
   //Only do this once.
-  //int id = 4; // 4 bytes
-  //EEPROM.put(id_addr, id);
+  //int put_id = 22; // 4 bytes
+  //EEPROM.put(id_addr, put_id);
   //Get the id of this device.
   EEPROM.get(id_addr, id);
   String id_stri = String::format("ny_t%d", id); //Create the line to log
@@ -78,12 +62,6 @@ void setup() {
 
   //Alive varible
   Particle.variable("areyoualive", message);
-  Particle.variable("issdgood", initilized);
-
-  Particle.function("safeShut", cloudCalls);
-
-  //Sd SPI_HALF_SPEED
-  pinMode(led1, OUTPUT);
 
   //lastSendTemp
   lastSendTemp = Time.minute();
@@ -94,27 +72,23 @@ void loop() {
 
   // Keep-alive
   Particle.process();
+
   //Check network health.
   checkNetwork();
 
   //Keep-alives
   checkIns();
-  //Let HybridLogHandler do it sending
-  //logHandler.loop();
-  //Keep-alives
-  checkIns();
-
-  //sd.sync();
 
   //Maker Kit tutorial
-  //Shortend version of actual code see url below for fu
+  //Shortend version of actual code; see url below for full code
   //https://docs.particle.io/tutorials/projects/maker-kit/#tutorial-4-temperature-logger
 
   //Send in 10min intervals
-  if(abs(Time.minute()-lastSendTemp) != 10)
+  if(abs(Time.minute()-lastSendTemp) < 10)
   {
     return;
   }
+
   byte i;
   byte present = 0;
   byte data[12];
@@ -123,16 +97,14 @@ void loop() {
 
 
 
-  //ROM = 28 FF 4 75 54 15 3 6A
   //Chip = DS18B20
-  addr[0] = 0x28;
-  addr[1] = 0xFF;
-  addr[2] = 0x4;
-  addr[3] = 0x75;
-  addr[4] = 0x54;
-  addr[5] = 0x15;
-  addr[6] = 0x3;
-  addr[7] = 0x6A;
+  if ( !ds.search(addr)) {
+     Serial.println("No more addresses.");
+     Serial.println();
+     ds.reset_search();
+     delay(250);
+     return;
+   }
 
 
   // second the CRC is checked, on fail,
@@ -229,49 +201,4 @@ void checkIns()
   wd.checkin();
   // Keep-alive
   Particle.process();
-}
-
-void LazyInit()
-{
-  if(!initilized)
-  {
-    // Initialize SdFat or print a detailed error message and halt
-    // Use half speed like the native library.
-    // Change to SPI_FULL_SPEED for more performance(was SPI_HALF_SPEED).
-    if (!sd.begin(chipSelect, SPI_HALF_SPEED))
-    {
-      sd.initErrorPrint();
-    }
-    else
-    {
-      initilized = true;
-    }
-  }
-}
-
-int cloudCalls(String useless)
-{
-  shutdown();
-  return 1;
-}
-
-void shutdown(){
-    while(hlIsWriting || sdlIsWriting)
-    {
-      checkIns();
-    }
-    while(1)
-    {
-      digitalWrite(led1, HIGH);
-
-      // We'll leave it on for 1 second...
-      delay(1000);
-
-      // Then we'll turn it off...
-      digitalWrite(led1, LOW);
-
-      // Wait 1 second...
-      delay(1000);
-    }
-
 }
