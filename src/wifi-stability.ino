@@ -102,6 +102,7 @@ void loop() {
      Serial.println("No more addresses.");
      Serial.println();
      ds.reset_search();
+     checkIns();
      delay(250);
      return;
    }
@@ -112,16 +113,17 @@ void loop() {
 
   if (OneWire::crc8(addr, 7) != addr[7]) {
     Serial.println("CRC is not valid!");
+    checkIns();
     return;
   }
-
+  checkIns();
   // we have a good address at this point
   // we will check if its the correct chip or just return
   if (addr[0] != 0x28)
   {
     return;
   }
-
+  checkIns();
   // this device has temp so let's read it
 
   ds.reset();               // first clear the 1-wire bus
